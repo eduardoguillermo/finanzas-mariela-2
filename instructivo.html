@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finanzas Mariela · Manual de Usuario</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --green: #10b981;
+    --green-light: #ecfdf5;
+    --amber: #f59e0b;
+    --amber-light: #fffbeb;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --teal: #0f766e;
+    --teal-light: #f0fdfa;
+    --blue: #0284c7;
+    --blue-light: #f0f9ff;
+    --purple: #a855f7;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --sidebar-w: 260px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: var(--sidebar-w);
+    background: #1e293b;
+    color: #cbd5e1;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    padding: 0 0 32px 0;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid #334155;
+    margin-bottom: 8px;
+  }
+  .sidebar-logo h1 { font-size: 16px; font-weight: 700; color: white; }
+  .sidebar-logo p { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .sidebar a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 20px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: all .15s;
+  }
+  .sidebar a:hover, .sidebar a.active {
+    color: white;
+    background: #0f172a;
+    border-left-color: var(--primary);
+  }
+  .sidebar .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: #475569;
+    padding: 16px 20px 4px;
+  }
+  .content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: 860px;
+    padding: 40px 48px 80px;
+  }
+
+  .section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+  .section-icon { font-size: 28px; }
+  .section-title { font-size: 22px; font-weight: 700; color: var(--text); }
+  .section-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  h2 { font-size: 17px; font-weight: 700; margin: 28px 0 10px; color: var(--text); }
+  h3 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--text); }
+  p { margin-bottom: 10px; color: #374151; }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; color: #374151; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .card-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .card-body { font-size: 13px; color: #4b5563; }
+
+  .note {
+    background: var(--amber-light);
+    border-left: 4px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: #78350f;
+  }
+  .tip {
+    background: var(--green-light);
+    border-left: 4px solid var(--green);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: #065f46;
+  }
+  .warning {
+    background: var(--red-light);
+    border-left: 4px solid var(--red);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: #7f1d1d;
+  }
+  .info {
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: #0c4a6e;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { background: #f1f5f9; padding: 8px 12px; text-align: left; font-weight: 600; border: 1px solid var(--border); }
+  td { padding: 8px 12px; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) { background: #f8fafc; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-blue  { background: #dbeafe; color: #1e40af; }
+  .badge-amber { background: #fef3c7; color: #92400e; }
+  .badge-red   { background: #fee2e2; color: #991b1b; }
+  .badge-purple{ background: #f3e8ff; color: #6b21a8; }
+
+  code {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #1e293b;
+  }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    min-width: 28px; height: 28px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-body { padding-top: 4px; font-size: 14px; }
+
+  .hero {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: white;
+    padding: 40px 48px;
+    margin: -40px -48px 48px;
+  }
+  .hero h1 { font-size: 28px; font-weight: 800; }
+  .hero p { color: #94a3b8; margin-top: 6px; font-size: 15px; }
+  .hero-badges { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .dash-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 4px solid currentColor;
+  }
+  .dash-card h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 6px; }
+  .dash-card .value { font-size: 18px; font-weight: 700; }
+  .changelog-entry { border-left: 3px solid var(--accent, #6366f1); padding: 4px 0 4px 16px; margin-bottom: 28px; }
+  .changelog-version { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .changelog-version .v-num { font-size: 16px; font-weight: 700; color: var(--text); }
+  .changelog-list { margin: 0; padding-left: 20px; font-size: 13.5px; color: #4b5563; line-height: 1.7; }
+  .changelog-list li { margin-bottom: 3px; }
+  .changelog-tag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-right: 4px; }
+  .tag-feature { background: #dbeafe; color: #1e40af; }
+  .tag-fix { background: #fee2e2; color: #991b1b; }
+  .tag-infra { background: #f3e8ff; color: #6b21a8; }
+  .tag-docs { background: #fef3c7; color: #92400e; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 20px 16px; }
+    .hero { margin: -20px -16px 32px; padding: 24px 16px; }
+  }
+</style>
+</head>
+
+<div class="layout">
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>💵 Finanzas Mariela</h1>
+    <p>Manual de usuario · v1.0</p>
+  </div>
+
+  <div class="section-label">Introducción</div>
+  <a href="#intro">🏠 ¿Qué es esta app?</a>
+  <a href="#navegacion">🗂 Navegación</a>
+
+  <div class="section-label">Principal</div>
+  <a href="#carga">✍️ Carga</a>
+  <a href="#libro-diario">📊 Libro diario</a>
+
+  <div class="section-label">Otras pestañas</div>
+  <a href="#ahorros">💰 Ahorro</a>
+  <a href="#presupuesto">📈 Presupuesto</a>
+  <a href="#configuracion">⚙️ Configuración</a>
+  <a href="#rubros">📁 · Rubros</a>
+  <a href="#cuentas">🏦 · Cuentas</a>
+  <a href="#fijos">📋 · Fijos</a>
+
+  <div class="section-label">Menú ☰</div>
+  <a href="#menu">☰ Qué hay en el menú</a>
+  <a href="#torta">🥧 Gastos por rubro</a>
+  <a href="#historial">📅 Historial mensual</a>
+
+  <div class="section-label">Funciones especiales</div>
+  <a href="#santander">🏦 Mails de Santander</a>
+  <a href="#backup">💾 Backup y sincronización</a>
+  <a href="#salir">🚪 Salir</a>
+  <a href="#movil">📱 Uso en el celular</a>
+  <a href="#consola">🛠 Comandos consola</a>
+
+  <div class="section-label">Historial</div>
+  <a href="#changelog">🧾 Historial de cambios</a>
+</nav>
+
+<main class="content">
+
+  <div class="hero">
+    <h1>💵 Finanzas Mariela</h1>
+    <p>Manual completo de usuario — Registro diario de gastos e ingresos</p>
+    <div class="hero-badges">
+      <span class="badge badge-green">✓ v1.0</span>
+      <span class="badge badge-blue">✓ Sin servidor</span>
+      <span class="badge badge-amber">✓ Datos locales</span>
+      <span class="badge badge-purple">✓ Instancia aislada</span>
+      <span class="badge badge-red">✓ Detección Santander</span>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <span class="section-icon">🏠</span>
+      <div>
+        <div class="section-title">¿Qué es Finanzas Mariela?</div>
+        <div class="section-subtitle">Descripción general de la aplicación</div>
+      </div>
+    </div>
+    <p>Finanzas Mariela es un libro diario de gastos e ingresos: registrás cada movimiento con su rubro, cuenta y fecha, y la app te muestra en tiempo real el presupuesto ejecutado por categoría, tus tenencias por cuenta y un historial mensual completo.</p>
+    <p>Es una PWA (se instala como app) que funciona sin conexión y guarda todo en el dispositivo, con opciones de backup en carpeta local y en Google Drive.</p>
+    <div class="tip">💡 Esta es una instancia nueva y totalmente aislada de FinanzasPro Ledger: rediseñada con la paleta oscura de Control Financiero, con Ahorro y Presupuesto como pestañas propias, Configuración centralizada, y datos/Drive completamente separados (misma lógica, cero mezcla de información entre las dos apps).</div>
+  </section>
+
+  <!-- NAVEGACION -->
+  <section class="section" id="navegacion">
+    <div class="section-header">
+      <span class="section-icon">🗂</span>
+      <div>
+        <div class="section-title">Navegación</div>
+        <div class="section-subtitle">Cómo está organizada la pantalla</div>
+      </div>
+    </div>
+    <p>Arriba de todo, el <b>dashboard</b> muestra dos filas de cajitas: <b>Mes actual</b> (Presupuesto, Gastos, Restante) y <b>Tenencias</b> (Neto, Efectivo, cada cuenta configurada y 🎁 Especiales del mes).</p>
+    <p>Debajo, <b>4 pestañas de nivel principal</b> reemplazan al viejo panel izquierdo con tabs:</p>
+    <div class="dashboard-grid">
+      <div class="dash-card" style="color:var(--primary);">
+        <h4>🏠 Principal</h4>
+        <div class="value" style="font-size:13px;">Carga de movimiento (arriba) + Libro diario (abajo), a todo el ancho</div>
+      </div>
+      <div class="dash-card" style="color:var(--teal);">
+        <h4>💰 Ahorro</h4>
+        <div class="value" style="font-size:13px;">Seguimiento de fondos guardados por subrubro</div>
+      </div>
+      <div class="dash-card" style="color:var(--amber);">
+        <h4>📈 Presupuesto</h4>
+        <div class="value" style="font-size:13px;">Cards de límite y seguimiento por rubro, mes actual + histórico</div>
+      </div>
+      <div class="dash-card" style="color:var(--purple);">
+        <h4>⚙️ Configuración</h4>
+        <div class="value" style="font-size:13px;">Rubros, Cuentas y Fijos, en sub-pestañas</div>
+      </div>
+    </div>
+    <p>Arriba a la derecha, el ícono <b>☰</b> reemplaza al viejo pie de página: ahí están Ayuda, Exportar/Importar, Drive, Snapshots locales, Gastos por rubro, Historial mensual y Salir.</p>
+    <div class="info">ℹ️ Todos los botones de ayuda (🟡 ?) que ves junto a los títulos te traen directo a la sección correspondiente de este manual.</div>
+    <div class="note">📝 "Ingresos" ya no se muestra como cajita arriba (el ingreso real es lo que se acredita en el banco al cobrar — se ve reflejado en el saldo de la cuenta, no hace falta un total aparte). La tarjeta <b>🎁 Especiales (mes)</b> es tocable: abre el detalle de cada gasto especial del mes con su fecha, rubro y monto.</div>
+    <h2>Selector $U / USD</h2>
+    <p>En el header hay un switch <b>$U / USD</b> que cambia la moneda de visualización de Ahorros y otros totales. No convierte montos: cada registro guarda su propia moneda, y el switch simplemente filtra/formatea la vista.</p>
+  </section>
+
+  <!-- CARGA -->
+  <section class="section" id="carga">
+    <div class="section-header">
+      <span class="section-icon">✍️</span>
+      <div>
+        <div class="section-title">Carga</div>
+        <div class="section-subtitle">Registrar un movimiento nuevo — arriba del libro diario, en Principal</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">Elegí el <b>tipo de operación</b>: Gasto/Ingreso o Transferencia entre cuentas.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">Completá <b>Concepto</b>, <b>Monto</b> y <b>Fecha</b>.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">Si es Gasto/Ingreso, elegí el <b>rubro</b> (o usá los chips de rubros rápidos) y la <b>cuenta impactada</b>.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">Si es Transferencia, elegí cuenta <b>origen</b> (resta) y <b>destino</b> (suma).</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">Agregá una <b>nota</b> opcional y tocá <b>✓ Asentar registro</b>.</div></div>
+    </div>
+    <div class="tip">💡 El formulario ahora es horizontal (estilo Control Financiero) y vive pegado arriba del libro diario, no en una columna aparte — cargás y ves el asiento nuevo sin cambiar de pantalla.</div>
+    <div class="info">ℹ️ Cada movimiento tiene un campo <b>Moneda</b> ($U o USD). Por defecto toma la moneda activa del switch del header, pero se puede cambiar por registro.</div>
+  </section>
+
+  <!-- LIBRO DIARIO -->
+  <section class="section" id="libro-diario">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <div>
+        <div class="section-title">Libro diario</div>
+        <div class="section-subtitle">Listado de movimientos, debajo de la carga en Principal</div>
+      </div>
+    </div>
+    <p>Filtrá por rango de <b>fechas</b> o por texto/rubro con el selector avanzado. El contador inferior muestra la cantidad de asientos y el total filtrado.</p>
+    <div class="tip">💡 En el desplegable de filtro podés tipear la primera letra del rubro o cuenta para saltar directo a esa opción (el texto va antes del ícono, para que funcione el salto por teclado del navegador).</div>
+    <p>Al ocupar todo el ancho de la pantalla (ya no comparte columna con nada más), entran más movimientos visibles sin scrollear.</p>
+    <h2>Impresión / PDF</h2>
+    <p>El botón 🖨️ genera una vista de impresión del libro diario tal como está filtrado en pantalla.</p>
+  </section>
+
+  <!-- AHORROS -->
+  <section class="section" id="ahorros">
+    <div class="section-header">
+      <span class="section-icon">💰</span>
+      <div>
+        <div class="section-title">Ahorro</div>
+        <div class="section-subtitle">Pestaña de nivel principal — seguimiento de fondos guardados por subrubro</div>
+      </div>
+    </div>
+    <p>Registrá <b>ingresos</b> y <b>retiros</b> de ahorro por subrubro (por ejemplo, "Cambio Auto" o "Reservas"). Los totales por moneda se ven arriba de las tarjetas.</p>
+    <div class="tip">💡 Antes era un modal que tapaba toda la pantalla; ahora es una pestaña más, junto a Principal, Presupuesto y Configuración.</div>
+    <h2>Subrubros</h2>
+    <p>El botón ⚙️ Subrubros te permite crear, renombrar o eliminar las categorías de ahorro.</p>
+    <h2>Moneda por subrubro — cómo ahorrar en dólares</h2>
+    <p>Cada subrubro de ahorro tiene su propia moneda (UYU o USD), configurable al crear o editar el subrubro desde ⚙️ Subrubros. Si querés un fondo en dólares, creá (o editá) el subrubro y elegí <b>USD</b> — a partir de ahí todos los movimientos de ingreso/retiro de ese subrubro quedan en esa moneda automáticamente.</p>
+  </section>
+
+  <!-- PRESUPUESTO -->
+  <section class="section" id="presupuesto">
+    <div class="section-header">
+      <span class="section-icon">📈</span>
+      <div>
+        <div class="section-title">Presupuesto</div>
+        <div class="section-subtitle">Pestaña de nivel principal — cards de límite y seguimiento por rubro</div>
+      </div>
+    </div>
+    <p>Arriba, una cabecera de mes muestra cuántos rubros tienen límite configurado, el total gastado, el presupuestado y el % global de ejecución.</p>
+    <p>Debajo, una <b>card compacta por cada rubro</b> con límite (6 por fila en pantalla ancha), con:</p>
+    <ul>
+      <li>Nombre del rubro y % ejecutado</li>
+      <li>Monto gastado / límite</li>
+      <li>Barra de progreso con color según estado: <span class="badge badge-green">verde = ok</span> <span class="badge badge-amber">ámbar = cerca del límite (85%+)</span> <span class="badge badge-red">rojo = superado (100%+)</span></li>
+      <li>Texto de seguimiento: "Restan $X" o "Superado por $X"</li>
+    </ul>
+    <p>Los rubros sin límite configurado también aparecen (si tuvieron gasto en el mes), marcados como "sin límite" para no perderlos de vista.</p>
+    <p>Más abajo, <b>Meses anteriores</b> muestra un recap compacto (gastos, ingresos, neto) de cada mes con datos, sin el detalle card-por-card del mes actual.</p>
+    <div class="tip">💡 El formato de cards de límite y seguimiento está inspirado directamente en Control Financiero.</div>
+  </section>
+
+  <!-- CONFIGURACION -->
+  <section class="section" id="configuracion">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <div>
+        <div class="section-title">Configuración</div>
+        <div class="section-subtitle">Pestaña de nivel principal — Rubros, Cuentas y Fijos en sub-pestañas</div>
+      </div>
+    </div>
+    <p>Todo lo que antes vivía en el panel izquierdo (Rubros, Cuentas, Fijos) se mudó acá, dentro de una única pestaña con 3 sub-pestañas internas. La carga de movimientos (que también vivía ahí) ahora está en Principal.</p>
+  </section>
+
+  <!-- RUBROS -->
+  <section class="section" id="rubros">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <div>
+        <div class="section-title">Rubros</div>
+        <div class="section-subtitle">Configuración → Rubros — Categorías de gasto e ingreso</div>
+      </div>
+    </div>
+    <h2>Crear o editar un rubro</h2>
+    <p>Definí un <b>nombre</b>, el <b>tipo</b> (gasto o ingreso) y, opcionalmente, un <b>límite mensual</b> en pesos. Los rubros con límite aparecen con card de seguimiento en la pestaña Presupuesto.</p>
+    <h2>🎁 Rubro especial</h2>
+    <p>Marcá el checkbox <b>"Rubro especial"</b> para gastos no habituales que no querés que compitan con tu presupuesto normal (ej: reparaciones grandes, gastos médicos puntuales). Un gasto especial:</p>
+    <ul>
+      <li>✅ Sigue descontando saldo real de la cuenta/banco donde lo cargaste.</li>
+      <li>❌ No se cuenta en el total de "Gastos" del mes ni afecta el % de ejecución del presupuesto.</li>
+      <li>Aparece aparte, en la tarjeta <b>🎁 Especiales (mes)</b> de Tenencias — tocándola ves el detalle de cada uno.</li>
+    </ul>
+    <div class="tip">💡 Se puede marcar/desmarcar en cualquier momento editando el rubro — no hace falta crear uno nuevo.</div>
+    <h2>Límites por mes</h2>
+    <p>El selector "Límites del mes" te permite definir un tope distinto para meses puntuales sin tener que cambiar el límite general del rubro.</p>
+    <h2>Borrar un rubro (y que se borre también en tus otros dispositivos)</h2>
+    <p>Al eliminar un rubro, la app anota el borrado en una <b>papelera interna</b>. La próxima vez que sincronice con Drive (automático o "Fusionar"), ese borrado viaja al otro dispositivo y también desaparece ahí — no hace falta borrarlo a mano en cada lado.</p>
+    <div class="tip">💡 Si volvés a crear un rubro con el mismo nombre después de haberlo borrado, queda a salvo: la app compara fechas y no lo vuelve a borrar en el próximo sync, aunque la papelera todavía tenga ese nombre anotado.</div>
+    <div class="info">ℹ️ Los rubros se identifican por <b>nombre</b> al sincronizar entre dispositivos (no por id interno, que es local a cada uno). Si creás un rubro nuevo en un dispositivo, en el otro aparece solo tras el próximo sync — y si lo borrás, también se borra solo.</div>
+  </section>
+
+  <!-- CUENTAS -->
+  <section class="section" id="cuentas">
+    <div class="section-header">
+      <span class="section-icon">🏦</span>
+      <div>
+        <div class="section-title">Cuentas</div>
+        <div class="section-subtitle">Configuración → Cuentas — Bancos, efectivo y Google Drive</div>
+      </div>
+    </div>
+    <p>Siempre existe la cuenta <b>Efectivo</b>. Podés nombrar hasta 3 cuentas de débito adicionales (banco, Mercado Pago, billetera virtual, etc.).</p>
+    <div class="tip">💡 Si le ponés nombre a una cuenta en un dispositivo, el nombre viaja solo al resto en el próximo sync (siempre que en el otro lado todavía tenga el nombre de fábrica "Banco 1"/"Banco 2" — si ya le pusiste un nombre propio distinto ahí, no se pisa).</div>
+    <h2>Google Drive (opcional)</h2>
+    <p>Pegá tu <b>Client ID</b> de Google Cloud Console para habilitar el backup en Drive. Sin este dato, los botones de Drive quedan ocultos y solo se usan carpeta local y snapshots.</p>
+    <div class="warning">⚠️ El Client ID es por dispositivo/navegador — si cambiás de PC o de celular, hay que configurarlo de nuevo ahí. Ver la sección <a href="#movil">📱 Uso en el celular</a> si no encontrás cómo llegar a Configuración desde el teléfono.</div>
+  </section>
+
+  <!-- FIJOS -->
+  <section class="section" id="fijos">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <div>
+        <div class="section-title">Fijos</div>
+        <div class="section-subtitle">Configuración → Fijos — Servicios fijos y compras en cuotas</div>
+      </div>
+    </div>
+    <p>Esta sub-pestaña agrupa los <b>servicios fijos</b> (vencimientos recurrentes) y las <b>compras en cuotas</b> en curso, para tenerlos a mano sin mezclarlos con la carga diaria.</p>
+    <h2 id="vencimientos">Próximos vencimientos</h2>
+    <p>El aviso "⚠️ Próximos vencimientos" alerta sobre servicios fijos o cuotas que están por vencer, para que no se te pasen antes de cargarlos como gasto.</p>
+  </section>
+
+  <!-- MENU -->
+  <section class="section" id="menu">
+    <div class="section-header">
+      <span class="section-icon">☰</span>
+      <div>
+        <div class="section-title">Menú ☰</div>
+        <div class="section-subtitle">Reemplaza al viejo pie de página</div>
+      </div>
+    </div>
+    <p>El ícono ☰ arriba a la derecha del header abre un panel con todo lo que antes estaba en el footer, agrupado:</p>
+    <table>
+      <thead><tr><th>Grupo</th><th>Contiene</th></tr></thead>
+      <tbody>
+        <tr><td><b>Estado</b></td><td>Aviso de almacenamiento lleno, actualización disponible</td></tr>
+        <tr><td><b>Ayuda</b></td><td>❓ Manual de usuario (este documento)</td></tr>
+        <tr><td><b>Datos</b></td><td>📂 Vincular carpeta, 📥 Exportar, 📤 Importar, ☁️ Drive (subir/restaurar), 💾 Snapshots locales</td></tr>
+        <tr><td><b>Reportes</b></td><td>🥧 Gastos por rubro, 📅 Historial mensual</td></tr>
+        <tr><td>—</td><td>🚪 Guardar y salir</td></tr>
+      </tbody>
+    </table>
+    <div class="note">📝 El botón "🔁 Movimientos recurrentes" y el panel "🏆 Top gastos del mes" se eliminaron de la app (no solo del footer) — no estaban aportando lo suficiente para el espacio que ocupaban.</div>
+  </section>
+
+  <!-- TORTA -->
+  <section class="section" id="torta">
+    <div class="section-header">
+      <span class="section-icon">🥧</span>
+      <div>
+        <div class="section-title">Gastos por rubro</div>
+        <div class="section-subtitle">Menú ☰ → Reportes — Gráfico de torta, mes actual y últimos 12 meses</div>
+      </div>
+    </div>
+    <p>Abre un gráfico de torta con la distribución del gasto por categoría. Tiene dos pestañas: el mes en curso y una vista acumulada de los últimos 12 meses.</p>
+  </section>
+
+  <!-- HISTORIAL -->
+  <section class="section" id="historial">
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <div>
+        <div class="section-title">Historial mensual</div>
+        <div class="section-subtitle">Menú ☰ → Reportes — Consulta de meses cerrados</div>
+      </div>
+    </div>
+    <p>Filtrá por <b>tipo</b> de movimiento, <b>rubro</b> y <b>moneda</b> para revisar cualquier mes anterior. El botón <b>📊 Exportar Excel</b> descarga el detalle completo del historial a una planilla, incluyendo la columna Moneda.</p>
+  </section>
+
+  <!-- SANTANDER -->
+  <section class="section" id="santander">
+    <div class="section-header">
+      <span class="section-icon">🏦</span>
+      <div>
+        <div class="section-title">Mails de Santander</div>
+        <div class="section-subtitle">Detección automática de compras con tarjeta de débito, vía Gmail</div>
+      </div>
+    </div>
+    <p>La app puede leer los mails de aviso de compra con tarjeta que manda Santander Uruguay ("Aviso: uso de tarjeta de débito") y armarte un gasto prellenado — solo confirmás el rubro y guardás.</p>
+    <h2>Cómo se usa</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">Tocá el botón rojo <b>📧 Chequear mails</b> arriba a la derecha del header.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">La primera vez, Google va a pedir el consentimiento de lectura de Gmail — está fijado a la casilla <code>margonqui@gmail.com</code>, sin importar qué cuenta de Google tengas activa en el navegador para otra cosa.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">Por cada mail nuevo encontrado se abre un modal con concepto, monto y fecha prellenados, cuenta preseleccionada en <b>Santander (debito1)</b> — elegís el rubro y tocás ✅ Guardar (o Descartar).</div></div>
+    </div>
+    <div class="tip">💡 En PC además hay un chequeo automático y silencioso a los pocos segundos de abrir la app. En el celular queda solo el botón manual.</div>
+    <h2>Qué mails reconoce</h2>
+    <p>Solo los de asunto <b>"uso de tarjeta"</b> desde <code>notificaciones@santander.com.uy</code> — compras con tarjeta de débito y retiros de cajero (el mail no distingue entre ambos, solo indica el establecimiento). Resúmenes, transferencias u otro tipo de aviso del banco no se procesan.</p>
+    <div class="warning">⚠️ Requiere la <b>Gmail API</b> habilitada en el proyecto de Google Cloud del Client ID que uses, y que la casilla <code>margonqui@gmail.com</code> esté agregada como <b>usuario de prueba</b> en la pantalla de consentimiento de OAuth (Google Cloud Console → Google Auth Platform → Público), mientras el proyecto no esté verificado/publicado.</div>
+    <h2>Si un mail no se reconoce</h2>
+    <p>Abrí la consola del navegador (F12) antes de tocar "Chequear mails": si algún mail no matchea el formato esperado, aparece un log <code>[gm-gmail] mail candidato NO matcheó el parser</code> con el texto completo — eso permite ajustar el reconocimiento si el banco cambia el formato del aviso.</p>
+  </section>
+
+  <!-- BACKUP -->
+  <section class="section" id="backup">
+    <div class="section-header">
+      <span class="section-icon">💾</span>
+      <div>
+        <div class="section-title">Backup y sincronización</div>
+        <div class="section-subtitle">Cómo se guardan, protegen y sincronizan los datos entre dispositivos</div>
+      </div>
+    </div>
+    <h2>Dónde viven los datos</h2>
+    <p>Todo se guarda en el <code>localStorage</code> del navegador, en el dispositivo. No hay servidor ni base de datos externa. Las claves usadas (<code>fm_*</code>) son propias de esta app — no se mezclan con FinanzasPro Ledger aunque uses el mismo navegador.</p>
+    <h2>Métodos de backup</h2>
+    <table>
+      <thead><tr><th>Método</th><th>Cómo funciona</th></tr></thead>
+      <tbody>
+        <tr><td><b>💾 Local (snapshots)</b></td><td>Guarda automáticamente hasta 10 copias en el propio navegador. Se puede restaurar desde el menú ☰ → Snapshots locales.</td></tr>
+        <tr><td><b>📂 Carpeta</b></td><td>Vinculás una carpeta del dispositivo y la app escribe un backup ahí en cada cambio importante (con debounce de 5 segundos).</td></tr>
+        <tr><td><b>☁️ Drive</b></td><td>Requiere Client ID configurado en Configuración → Cuentas. Usa una carpeta visible y propia, <b>"FinanzasMariela"</b>, separada de la carpeta "FinanzasPro" de la app vieja.</td></tr>
+        <tr><td><b>📥 Exportar / 📤 Importar</b></td><td>Backup manual a un archivo <code>.json</code> que podés guardar donde quieras.</td></tr>
+      </tbody>
+    </table>
+    <div class="warning">⚠️ Ningún método reemplaza a los otros — usalos combinados. Los snapshots locales se pierden si borrás datos del navegador.</div>
+
+    <h2>Sincronización automática entre dispositivos (vía Drive)</h2>
+    <p>Si tenés Drive configurado en dos o más dispositivos (por ejemplo celular y PC), unos 5 segundos después de abrir la app se revisa Drive en silencio y se fusiona lo nuevo, sin popups ni interrupciones. Lo que trae:</p>
+    <table>
+      <thead><tr><th>Dato</th><th>¿Se sincroniza?</th></tr></thead>
+      <tbody>
+        <tr><td>Movimientos (gastos/ingresos/transferencias)</td><td>✅ Sí — por identidad única, nunca duplica ni pisa uno más nuevo con uno viejo</td></tr>
+        <tr><td>Rubros nuevos</td><td>✅ Sí — por nombre, junto con su límite mensual si lo tenía</td></tr>
+        <tr><td>Rubros borrados</td><td>✅ Sí — con papelera interna, se propaga el borrado a los demás dispositivos</td></tr>
+        <tr><td>Nombres de cuentas (bancos)</td><td>✅ Sí — solo si acá seguía el nombre de fábrica; si ya le pusiste uno propio, no se pisa</td></tr>
+        <tr><td>Ahorros (subrubros y movimientos)</td><td>❌ No — hoy no se fusionan automáticamente</td></tr>
+        <tr><td>Fijos y cuotas</td><td>❌ No — hoy no se fusionan automáticamente</td></tr>
+      </tbody>
+    </table>
+    <div class="info">ℹ️ También podés forzar la sincronización a mano desde el menú ☰: <b>☁️ Restaurar de Drive</b> te muestra los backups disponibles con dos opciones — <b>🔀 Fusionar</b> (suma lo nuevo, recomendado) o <b>Reemplazar</b> (borra todo lo local y lo cambia por ese backup — usar solo si sabés lo que hacés).</div>
+  </section>
+
+  <!-- SALIR -->
+  <section class="section" id="salir">
+    <div class="section-header">
+      <span class="section-icon">🚪</span>
+      <div>
+        <div class="section-title">Salir</div>
+        <div class="section-subtitle">Menú ☰ → Guardar y salir — Cierre seguro con backup</div>
+      </div>
+    </div>
+    <p>Guarda un snapshot local, intenta backup en carpeta local (si está vinculada) y sube a Drive.</p>
+    <div class="warning">⚠️ Si Drive está configurado (tenés Client ID cargado), subir el backup es <b>obligatorio</b> para poder salir: si el token venció, la app va a pedirte reautenticar con Google (puede abrir un popup) y no te va a dejar cerrar hasta lograrlo o hasta que decidas desactivar Drive. Esto es a propósito, para que nunca cierres pensando que sincronizó cuando en realidad no lo hizo.</div>
+    <p>Si cancelás la autenticación o falla, no perdés datos — el snapshot local ya quedó guardado — pero tenés que reintentar "Salir" o desactivar el Client ID en Configuración → Cuentas si por ahora no vas a usar Drive.</p>
+  </section>
+
+  <!-- MOVIL -->
+  <section class="section" id="movil">
+    <div class="section-header">
+      <span class="section-icon">📱</span>
+      <div>
+        <div class="section-title">Uso en el celular</div>
+        <div class="section-subtitle">Vista Rápida y cómo llegar a Configuración desde el teléfono</div>
+      </div>
+    </div>
+    <p>En pantallas chicas (≤480px de ancho), la app abre directo en la <b>Vista Rápida</b>: una pantalla fija pensada solo para cargar un gasto en segundos (monto grande, chips de rubro, moneda, cuenta y fecha). No tiene botón para volver a la app completa — es intencional, para que cargar un gasto sea lo más rápido posible.</p>
+    <h2>Cómo llegar a Configuración, Presupuesto, etc. desde el celular</h2>
+    <p>Abrí la app agregando <code>?completa=1</code> al final del link:</p>
+    <pre>https://eduardoguillermo.github.io/finanzas-mariela/?completa=1</pre>
+    <p>Eso fuerza la app completa (con menú ☰ y las 4 pestañas) aunque la pantalla sea chica. Se ve reducida porque está pensada para pantalla grande, pero es la única forma de llegar a Configuración desde el teléfono.</p>
+    <div class="tip">💡 Usalo la primera vez para configurar el Client ID de Drive en el celular — después, la Vista Rápida sincroniza sola.</div>
+  </section>
+
+  <!-- CONSOLA -->
+  <section class="section" id="consola">
+    <div class="section-header">
+      <span class="section-icon">🛠</span>
+      <div>
+        <div class="section-title">Comandos de Consola</div>
+        <div class="section-subtitle">Comandos útiles para la consola del navegador (F12)</div>
+      </div>
+    </div>
+    <h2>Datos</h2>
+    <pre>// Ver todos los rubros
+console.log(JSON.stringify(DB.rubros))
+
+// Ver rubros borrados (papelera)
+console.log(JSON.stringify(DB.rubrosBorrados))
+
+// Ver últimos movimientos
+console.log(JSON.stringify(DB.movimientos.slice(-5)))</pre>
+
+    <h2>Drive</h2>
+    <pre>// Ver token de Drive activo
+console.log(gmGToken ? 'Token activo' : 'Sin token')</pre>
+  </section>
+
+  <!-- CHANGELOG -->
+  <section class="section" id="changelog">
+    <div class="section-header">
+      <span class="section-icon">🧾</span>
+      <div>
+        <div class="section-title">Historial de cambios</div>
+        <div class="section-subtitle">Registro de versiones — de más reciente a más antigua</div>
+      </div>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v1.0</span><span class="changelog-tag tag-fix">fix</span></div>
+      <ul class="changelog-list">
+        <li><b>Crítico:</b> editar un movimiento existente (gasto/ingreso/transferencia) creaba un registro nuevo además de actualizar el original, duplicando el asiento. Corregido — auditoría completa de código tras la seguidilla de parches de esta sesión.</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.29 – v0.30</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>Filtro del Libro diario: el texto va antes del ícono en cada opción, para poder tipear la primera letra y saltar directo (antes el emoji al inicio lo impedía)</li>
+        <li>Nueva tarjeta <b>🎁 Especiales (mes)</b> en Tenencias, tocable: abre el detalle de cada gasto especial del mes con fecha, rubro y monto</li>
+        <li>Se saca "Ingresos" de la cajita de arriba — el ingreso real ya se ve reflejado en el saldo del banco al cobrar</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.20 – v0.28</span><span class="changelog-tag tag-fix">fix</span></div>
+      <ul class="changelog-list">
+        <li>Papelera de rubros: ahora compara fecha de creación contra fecha de borrado, para que un rubro recreado con el mismo nombre no se vuelva a borrar en el próximo sync</li>
+        <li>Fix visual: el checkbox "Rubro especial" no mostraba el tilde (una regla CSS global le sacaba el render nativo)</li>
+        <li>Fix: operaciones de Ahorro (guardar/eliminar) a veces no repintaban la pantalla hasta salir y volver a entrar — corregido diriendo el repintado al siguiente frame</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.21 – v0.25</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li><b>Nueva función:</b> detección automática de compras con tarjeta de débito Santander vía mails de Gmail — ver sección <a href="#santander">🏦 Mails de Santander</a></li>
+        <li>El token de Gmail quedó separado del de Drive, fijo a la casilla <code>margonqui@gmail.com</code> mediante el parámetro <code>hint</code> de Google — no depende de qué cuenta esté activa en el navegador para otras cosas</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.10</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>Al tocar "Salir", si Drive está configurado, subir el backup pasa a ser obligatorio: si el token venció, pide reautenticar y no cierra hasta lograrlo (o hasta desactivar Drive)</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.9</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>El borrado de rubros ahora se propaga entre dispositivos: papelera interna (tombstones) que viaja con el sync automático y con "Fusionar"</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.8</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>El sync también trae los nombres de cuentas/bancos configurados en otro dispositivo (si acá seguían con el nombre de fábrica)</li>
+        <li>Fix: la Vista Rápida móvil todavía decía "FinanzasPro" en el encabezado — corregido a "Finanzas Mariela"</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.7</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>Ícono propio de la app (tarjeta índigo + barras ascendentes en teal), favicon y apple-touch-icon — antes usaba fotos de stock heredadas de FinanzasPro</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.6</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>El sync trae rubros nuevos por nombre (auto al abrir y "Fusionar"), incluyendo el límite mensual que tenían configurado en origen</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.4 – v0.5</span><span class="changelog-tag tag-fix">fix</span></div>
+      <ul class="changelog-list">
+        <li>Fix: la pantalla Principal no scrolleaba (herencia de CSS del layout viejo de 3 columnas fijas)</li>
+        <li>Cards de Presupuesto reducidas y fijadas a 6 columnas por fila</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.3</span><span class="changelog-tag tag-feature">feature</span></div>
+      <ul class="changelog-list">
+        <li>Reorganización mayor: 4 pestañas de nivel principal (Principal / Ahorro / Presupuesto / Configuración)</li>
+        <li>Carga de movimiento pasa a ser horizontal, arriba del libro diario (estilo Control Financiero), a todo el ancho</li>
+        <li>Rubros, Cuentas y Fijos se mudan a Configuración con sub-pestañas; desaparece el panel izquierdo viejo</li>
+        <li>Presupuesto: nueva pestaña con cards de límite y seguimiento por rubro (mes actual) + recap de meses anteriores</li>
+        <li>Se elimina el módulo de Movimientos recurrentes y el panel "Top gastos del mes"</li>
+        <li>Cards del dashboard superior (Mes actual / Bancos y efectivo) reducidas ~50%</li>
+      </ul>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-version"><span class="v-num">v0.1 – v0.2</span><span class="changelog-tag tag-infra">infra</span></div>
+      <ul class="changelog-list">
+        <li>Nace Finanzas Mariela: instancia y repositorio nuevos, totalmente aislados de FinanzasPro Ledger (repo <code>finanzas-mariela</code>, claves de localStorage <code>fm_*</code>, carpeta de Drive "FinanzasMariela")</li>
+        <li>Paleta oscura estilo Control Financiero (navy + índigo), bordes de color por panel, menú ☰ reemplazando el footer</li>
+      </ul>
+    </div>
+
+  </section>
+
+</main>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const links = document.querySelectorAll('.sidebar a');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const id = entry.target.id;
+      const active = document.querySelector(`.sidebar a[href="#${id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
