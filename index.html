@@ -953,7 +953,7 @@
 // ════════════════════════════════════════════════════
 //  CONSTANTES Y ESTADO GLOBAL
 // ════════════════════════════════════════════════════
-const APP_VERSION = '1.3.0-dev';
+const APP_VERSION = '1.3.1-dev';
 const DEV_MODE = true; // finanzas-mariela-2 (dev): Drive SOLO LECTURA — puede bajar/fusionar backups de la carpeta de prod, nunca subir
 
 function gmNuevoUUID() {
@@ -2127,6 +2127,7 @@ function gmMostrarEspecialesMes() {
     const items = DB.movimientos.filter(m => {
         if (claveMesDeISO(m.fecha) !== claveMes) return false;
         if (getTipoMov(m) !== 'gasto') return false;
+        if ((m.moneda || 'UYU') !== vistaMoneda) return false;
         const rubro = DB.rubros.find(r => r.id === m.rubroId);
         return rubro && rubro.especial;
     }).sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
@@ -2150,7 +2151,7 @@ function gmMostrarEspecialesMes() {
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;';
     ov.innerHTML = `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px;min-width:280px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h3 style="margin:0; font-size:14px;">🎁 Especiales · ${etiquetaMes(claveMes)}</h3>
+            <h3 style="margin:0; font-size:14px;">🎁 Especiales · ${etiquetaMes(claveMes)} · ${vistaMoneda === 'USD' ? 'USD' : '$U'}</h3>
             <button onclick="document.getElementById('gm-especiales-overlay').remove()" style="background:none; border:none; font-size:18px; cursor:pointer; color:var(--text-main);">✕</button>
         </div>
         <div>${filas}</div>
