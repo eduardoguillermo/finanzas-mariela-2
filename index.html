@@ -616,6 +616,7 @@
             <div class="card-bal" id="grp-debito2"><h4 id="label-hdr-debito2">Banco 2</h4><p id="view-bal-debito2">$0,00</p></div>
             <div class="card-bal" id="grp-debito3" style="display:none"><h4 id="label-hdr-debito3">Banco 3</h4><p id="view-bal-debito3">$0,00</p></div>
             <div class="card-bal" id="grp-debito4" style="display:none"><h4 id="label-hdr-debito4">Banco 4</h4><p id="view-bal-debito4">$0,00</p></div>
+            <div class="card-bal" id="grp-debito5" style="display:none"><h4 id="label-hdr-debito5">Banco 5</h4><p id="view-bal-debito5">$0,00</p></div>
             <div class="card-bal" id="card-especiales-mes" onclick="gmMostrarEspecialesMes()" style="cursor:pointer;"><h4>🎁 Especiales (mes) ▾</h4><p id="view-especiales-historico" style="color:var(--gasto)">$0,00</p></div>
         </div>
     </div>
@@ -677,7 +678,7 @@
                         </div>
                         <div style="grid-column:span 2;">
                             <label for="mov-origen">Cuenta impactada</label>
-                            <select id="mov-origen"></select>
+                            <select id="mov-origen" onchange="gmAlCambiarCuentaMovimiento()"></select>
                         </div>
                     </div>
                     <div id="rubros-rapidos" style="display:flex;flex-wrap:wrap;gap:4px;margin:-4px 0 8px;"></div>
@@ -829,26 +830,62 @@
                     <span id="ayuda-cuentas"></span>
                 </div>
                 <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.5; max-width:420px;">
-                    Configurá los nombres de tus cuentas bancarias. Siempre existe la cuenta <strong>Efectivo</strong>.
+                    Configurá los nombres de tus cuentas bancarias y su moneda fija. Siempre existe la cuenta <strong>Efectivo</strong> (libre: elegís la moneda en cada movimiento).
                 </p>
                 <div style="max-width:420px;">
                     <div class="form-group">
                         <label for="cfg-debito1">Cuenta 1 (débito)</label>
-                        <input type="text" id="cfg-debito1" placeholder="Ej: Galicia">
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" id="cfg-debito1" placeholder="Ej: Galicia" style="flex:1;">
+                            <select id="cfg-moneda-debito1" style="width:78px;flex-shrink:0;"><option value="UYU">$U</option><option value="USD">USD</option></select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="cfg-debito2">Cuenta 2 (débito)</label>
-                        <input type="text" id="cfg-debito2" placeholder="Ej: Mercado Pago">
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" id="cfg-debito2" placeholder="Ej: Mercado Pago" style="flex:1;">
+                            <select id="cfg-moneda-debito2" style="width:78px;flex-shrink:0;"><option value="UYU">$U</option><option value="USD">USD</option></select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="cfg-debito3">Cuenta 3 (opcional)</label>
-                        <input type="text" id="cfg-debito3" placeholder="Ej: Brubank">
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" id="cfg-debito3" placeholder="Ej: Brubank" style="flex:1;">
+                            <select id="cfg-moneda-debito3" style="width:78px;flex-shrink:0;"><option value="UYU">$U</option><option value="USD">USD</option></select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="cfg-debito4">Cuenta 4 (opcional)</label>
-                        <input type="text" id="cfg-debito4" placeholder="Ej: Prex">
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" id="cfg-debito4" placeholder="Ej: Prex" style="flex:1;">
+                            <select id="cfg-moneda-debito4" style="width:78px;flex-shrink:0;"><option value="UYU">$U</option><option value="USD">USD</option></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cfg-debito5">Cuenta 5 (opcional)</label>
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" id="cfg-debito5" placeholder="A definir" style="flex:1;">
+                            <select id="cfg-moneda-debito5" style="width:78px;flex-shrink:0;"><option value="UYU">$U</option><option value="USD">USD</option></select>
+                        </div>
                     </div>
                     <button id="btn-guardar-bancos" class="btn-secondary btn-block" style="margin-top:2px;">Actualizar nombres</button>
+
+                    <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:6px;">🏦 Mails de Santander</label>
+                        <p style="font-size:10px;color:var(--text-muted);margin:0 0 8px;">A qué cuenta local va cada gasto detectado por mail, según la moneda del mail.</p>
+                        <div style="display:flex;gap:6px;">
+                            <div style="flex:1;">
+                                <label for="cfg-gmail-cuenta-uyu" style="font-size:10px;">Mail en $U →</label>
+                                <select id="cfg-gmail-cuenta-uyu"></select>
+                            </div>
+                            <div style="flex:1;">
+                                <label for="cfg-gmail-cuenta-usd" style="font-size:10px;">Mail en USD →</label>
+                                <select id="cfg-gmail-cuenta-usd"></select>
+                            </div>
+                        </div>
+                        <button id="btn-guardar-gmail-cuentas" class="btn-secondary btn-block" style="margin-top:6px;" onclick="guardarGmailCuentas()">Guardar</button>
+                    </div>
 
                     <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
                     <div class="form-group">
@@ -916,7 +953,7 @@
 // ════════════════════════════════════════════════════
 //  CONSTANTES Y ESTADO GLOBAL
 // ════════════════════════════════════════════════════
-const APP_VERSION = '1.2.0-dev';
+const APP_VERSION = '1.3.0-dev';
 const DEV_MODE = true; // finanzas-mariela-2 (dev): Drive SOLO LECTURA — puede bajar/fusionar backups de la carpeta de prod, nunca subir
 
 function gmNuevoUUID() {
@@ -1293,7 +1330,7 @@ function gmMergeRubros(remoto) {
 // y del otro lado ya le pusieron nombre real, lo adopta. Si ya tiene un nombre propio distinto, no lo toca. ──
 function gmMergeCuentas(remoto) {
     if (!remoto || !remoto.cuentas) return 0;
-    const defaults = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '', debito4: '' };
+    const defaults = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '', debito4: '', debito5: '' };
     let actualizados = 0;
     Object.keys(defaults).forEach(key => {
         const local = (DB.cuentas[key] || '').trim();
@@ -1387,7 +1424,19 @@ function gmDriveCargarArchivo(id, token) {
 const GM_GMAIL_QUERY          = 'from:notificaciones@santander.com.uy subject:"uso de tarjeta" newer_than:30d';
 const GM_GMAIL_PROCESSED_KEY  = 'fm_gmail_processed';
 const GM_GMAIL_PROCESSED_DIAS = 45; // > 30 días de la query, con margen
-const GM_SANTANDER_CUENTA     = 'debito1';
+const GM_SANTANDER_CUENTA     = 'debito1'; // fallback si no hay nada configurado
+
+// Devuelve la cuenta local a la que debe imputarse un gasto de Santander detectado en 'moneda' (UYU/USD).
+// Prioridad: 1) mapeo explícito guardado en Configuración (DB.gmailCuentaSantander), 2) primera cuenta
+// cuya moneda fija coincida, 3) fallback GM_SANTANDER_CUENTA.
+function gmCuentaSantanderPara(moneda) {
+    const mapeo = DB.gmailCuentaSantander || {};
+    const explicita = mapeo[moneda];
+    if (explicita && getCuentas().some(c => c.key === explicita)) return explicita;
+    const porMoneda = getCuentas().find(c => c.moneda === moneda);
+    if (porMoneda) return porMoneda.key;
+    return GM_SANTANDER_CUENTA;
+}
 
 function gmEsMovil() {
     return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -1530,10 +1579,10 @@ function gmAbrirModalGmail(datos) {
         <h3 style="margin:0 0 4px;font-size:15px;display:flex;align-items:center;gap:6px;">🏦 Mail Santander <span style="font-size:10px;background:#ec0000;color:white;padding:2px 7px;border-radius:20px;font-weight:600;">débito ${datos.tarjeta ? '·'+datos.tarjeta : ''}</span></h3>
         <p style="font-size:11px;color:var(--text-muted);margin:0 0 14px;">Revisá y confirmá antes de guardar.</p>
         <div class="form-group"><label>Concepto</label><input type="text" id="gm-gmail-concepto" value="${(datos.comercio||'').replace(/"/g,'&quot;')}"></div>
-        <div class="form-group"><label>Monto (${datos.moneda})</label><input type="number" step="0.01" id="gm-gmail-monto" value="${datos.monto}"></div>
+        <div class="form-group"><label id="gm-gmail-monto-label">Monto (${datos.moneda})</label><input type="number" step="0.01" id="gm-gmail-monto" value="${datos.monto}"></div>
         <div class="form-group"><label>Fecha</label><input type="date" id="gm-gmail-fecha" value="${datos.fecha}"></div>
         <div class="form-group"><label>Rubro</label><select id="gm-gmail-rubro"><option value="">Elegir…</option>${rubrosOpts}</select></div>
-        <div class="form-group"><label>Cuenta</label><select id="gm-gmail-cuenta">${getCuentas().map(c => `<option value="${c.key}" ${c.key===GM_SANTANDER_CUENTA?'selected':''}>${c.icon} ${c.label}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Cuenta</label><select id="gm-gmail-cuenta" onchange="gmGmailActualizarLabelMoneda('${(datos.moneda||'UYU')}')">${getCuentas().map(c => `<option value="${c.key}" ${c.key===gmCuentaSantanderPara(datos.moneda)?'selected':''}>${c.icon} ${c.label}</option>`).join('')}</select></div>
         <div class="modal-actions" style="margin-top:14px;">
             <button class="btn-secondary btn-sm" onclick="gmGmailDescartar('${datos._gmailId}', false)">Descartar</button>
             <button class="btn-secondary btn-sm" style="color:var(--gasto);" onclick="gmGmailDescartar('${datos._gmailId}', true)">Descartar definitivamente</button>
@@ -1543,6 +1592,13 @@ function gmAbrirModalGmail(datos) {
     document.body.appendChild(ov);
 }
 function gmGmailCerrarModal() { document.getElementById('gm-gmail-overlay')?.remove(); }
+function gmGmailActualizarLabelMoneda(monedaDetectada) {
+    const cuentaEl = document.getElementById('gm-gmail-cuenta');
+    const labelEl  = document.getElementById('gm-gmail-monto-label');
+    if (!cuentaEl || !labelEl) return;
+    const moneda = gmMonedaCuenta(cuentaEl.value) || monedaDetectada || 'UYU';
+    labelEl.textContent = 'Monto (' + moneda + ')';
+}
 function gmGmailDescartar(gmailId, definitivo) {
     if (definitivo && gmailId) gmGmailMarkProcessed(gmailId);
     gmGmailCerrarModal();
@@ -1558,7 +1614,11 @@ function gmGmailGuardarDesdeMail(gmailId) {
     if (!concepto || isNaN(monto) || monto <= 0 || isNaN(rubroId) || !fecha) {
         toast('Completá todos los campos.', 'error'); return;
     }
-    DB.movimientos.push(gmTouch({ id: DB.nid++, concepto, monto, rubroId, origen, destino: null, fecha, moneda: 'UYU' }));
+    // La moneda sale de la cuenta elegida (fuente de verdad). Si es Efectivo (sin moneda fija),
+    // se usa la que detectó el parser en el propio mail.
+    const datosOriginales = gmGmailQueue[gmGmailIdx] || {};
+    const moneda = gmMonedaCuenta(origen) || datosOriginales.moneda || 'UYU';
+    DB.movimientos.push(gmTouch({ id: DB.nid++, concepto, monto, rubroId, origen, destino: null, fecha, moneda }));
     save(); render();
     if (gmailId) gmGmailMarkProcessed(gmailId);
     toast('✅ Gasto de Santander guardado', 'success');
@@ -1823,8 +1883,14 @@ let DB = {
         debito1:  'Banco 1',
         debito2:  'Banco 2',
         debito3:  '',          // opcional; vacío = oculta
-        debito4:  ''           // opcional; vacío = oculta
+        debito4:  '',          // opcional; vacío = oculta
+        debito5:  ''           // opcional; vacío = oculta
     },
+    // Moneda fija de cada cuenta: todo movimiento que salga/entre de esa cuenta usa esta moneda automáticamente.
+    // 'efectivo' no tiene moneda fija (el efectivo puede ser pesos o dólares según el caso, se elige a mano).
+    cuentaMoneda: { debito1: 'UYU', debito2: 'UYU', debito3: 'UYU', debito4: 'UYU', debito5: 'UYU' },
+    // A qué cuenta local va cada gasto detectado por mail de Santander, según la moneda del mail.
+    gmailCuentaSantander: { UYU: '', USD: '' },
     cotizacion: { compra: 0, venta: 0 }, // dólar: compra = banco te compra USD (vendés vos); venta = banco te vende USD (comprás vos)
     presupuestosHistoricos: {},
     ahorros: {
@@ -1972,13 +2038,25 @@ function migrar(data) {
     }
     // Garantizar estructura cuentas siempre (por si viene de backup raro)
     if (!data.cuentas || typeof data.cuentas !== 'object') {
-        data.cuentas = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '', debito4: '' };
+        data.cuentas = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '', debito4: '', debito5: '' };
     }
     data.cuentas.efectivo = data.cuentas.efectivo || 'Efectivo';
     data.cuentas.debito1  = data.cuentas.debito1  || 'Banco 1';
     data.cuentas.debito2  = data.cuentas.debito2  || 'Banco 2';
     data.cuentas.debito3  = data.cuentas.debito3  || '';
     data.cuentas.debito4  = data.cuentas.debito4  || '';
+    data.cuentas.debito5  = data.cuentas.debito5  || '';
+    if (!data.cuentaMoneda || typeof data.cuentaMoneda !== 'object') {
+        data.cuentaMoneda = {};
+    }
+    ['debito1','debito2','debito3','debito4','debito5'].forEach(k => {
+        if (data.cuentaMoneda[k] !== 'USD' && data.cuentaMoneda[k] !== 'UYU') data.cuentaMoneda[k] = 'UYU';
+    });
+    if (!data.gmailCuentaSantander || typeof data.gmailCuentaSantander !== 'object') {
+        data.gmailCuentaSantander = { UYU: '', USD: '' };
+    }
+    data.gmailCuentaSantander.UYU = data.gmailCuentaSantander.UYU || '';
+    data.gmailCuentaSantander.USD = data.gmailCuentaSantander.USD || '';
     if (!data.cotizacion || typeof data.cotizacion !== 'object') {
         data.cotizacion = { compra: 0, venta: 0 };
     }
@@ -2089,13 +2167,20 @@ function gmMostrarEspecialesMes() {
 // ════════════════════════════════════════════════════
 function getCuentas() {
     const lista = [
-        { key: 'efectivo', label: DB.cuentas.efectivo || 'Efectivo', icon: '💵' },
-        { key: 'debito1',  label: DB.cuentas.debito1  || 'Banco 1',  icon: '💳' },
-        { key: 'debito2',  label: DB.cuentas.debito2  || 'Banco 2',  icon: '💳' },
+        { key: 'efectivo', label: DB.cuentas.efectivo || 'Efectivo', icon: '💵', moneda: null },
+        { key: 'debito1',  label: DB.cuentas.debito1  || 'Banco 1',  icon: '💳', moneda: gmMonedaCuenta('debito1') },
+        { key: 'debito2',  label: DB.cuentas.debito2  || 'Banco 2',  icon: '💳', moneda: gmMonedaCuenta('debito2') },
     ];
-    if (DB.cuentas.debito3) lista.push({ key: 'debito3', label: DB.cuentas.debito3, icon: '💳' });
-    if (DB.cuentas.debito4) lista.push({ key: 'debito4', label: DB.cuentas.debito4, icon: '💳' });
+    if (DB.cuentas.debito3) lista.push({ key: 'debito3', label: DB.cuentas.debito3, icon: '💳', moneda: gmMonedaCuenta('debito3') });
+    if (DB.cuentas.debito4) lista.push({ key: 'debito4', label: DB.cuentas.debito4, icon: '💳', moneda: gmMonedaCuenta('debito4') });
+    if (DB.cuentas.debito5) lista.push({ key: 'debito5', label: DB.cuentas.debito5, icon: '💳', moneda: gmMonedaCuenta('debito5') });
     return lista;
+}
+// Moneda fija de una cuenta (null = libre, como Efectivo)
+function gmMonedaCuenta(key) {
+    if (key === 'efectivo') return null;
+    const m = DB.cuentaMoneda && DB.cuentaMoneda[key];
+    return (m === 'USD' || m === 'UYU') ? m : 'UYU';
 }
 function labelCuenta(key) {
     if (!key) return '?';
@@ -3699,6 +3784,7 @@ function editarMovimiento(id) {
     if (m.origen && document.getElementById('mov-origen')) {
         document.getElementById('mov-origen').value = m.origen;
     }
+    gmAlCambiarCuentaMovimiento();
     // Cambiar botón a modo edición
     const btn = document.getElementById('btn-guardar-movimiento');
     btn.textContent = '✏️ Actualizar registro';
@@ -3755,6 +3841,11 @@ function guardarCuentas() {
     DB.cuentas.debito2 = document.getElementById('cfg-debito2').value.trim() || 'Banco 2';
     DB.cuentas.debito3 = document.getElementById('cfg-debito3').value.trim();
     DB.cuentas.debito4 = document.getElementById('cfg-debito4').value.trim();
+    DB.cuentas.debito5 = document.getElementById('cfg-debito5').value.trim();
+    ['debito1','debito2','debito3','debito4','debito5'].forEach(k => {
+        const el = document.getElementById('cfg-moneda-' + k);
+        if (el) DB.cuentaMoneda[k] = (el.value === 'USD') ? 'USD' : 'UYU';
+    });
     const btn = document.getElementById('btn-guardar-bancos');
     btn.textContent = '✓ Actualizado';
     btn.style.background = 'var(--ingreso)';
@@ -3767,6 +3858,37 @@ function guardarCuentas() {
     toast('Cuentas actualizadas.', 'success');
     save(); render();
     initMesesVisor();
+}
+
+// Puebla los selects de "a qué cuenta va cada mail de Santander según moneda"
+function gmPoblarSelectsGmailCuentas() {
+    const elUyu = document.getElementById('cfg-gmail-cuenta-uyu');
+    const elUsd = document.getElementById('cfg-gmail-cuenta-usd');
+    if (!elUyu || !elUsd) return;
+    const opts = getCuentas().map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
+    elUyu.innerHTML = opts;
+    elUsd.innerHTML = opts;
+    const mapeo = DB.gmailCuentaSantander || { UYU: '', USD: '' };
+    elUyu.value = mapeo.UYU || gmCuentaSantanderPara('UYU');
+    elUsd.value = mapeo.USD || gmCuentaSantanderPara('USD');
+}
+
+function guardarGmailCuentas() {
+    DB.gmailCuentaSantander = {
+        UYU: document.getElementById('cfg-gmail-cuenta-uyu').value,
+        USD: document.getElementById('cfg-gmail-cuenta-usd').value
+    };
+    const btn = document.getElementById('btn-guardar-gmail-cuentas');
+    btn.textContent = '✓ Guardado';
+    btn.style.background = 'var(--ingreso)';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+        btn.textContent = 'Guardar';
+        btn.style.background = '';
+        btn.style.color = '';
+    }, 1200);
+    toast('Cuentas de mail actualizadas.', 'success');
+    save();
 }
 
 // ════════════════════════════════════════════════════
@@ -3833,6 +3955,23 @@ function gmSincronizarBotonConversion() {
     if (!btn) return;
     const tieneCotiz = DB.cotizacion && (DB.cotizacion.compra > 0 || DB.cotizacion.venta > 0);
     btn.style.display = tieneCotiz ? 'inline-flex' : 'none';
+}
+
+// Si la cuenta elegida en el movimiento tiene moneda fija, la aplica y bloquea el selector.
+// Efectivo (u otra cuenta sin moneda fija) deja el selector libre para elegir a mano.
+function gmAlCambiarCuentaMovimiento() {
+    const origenEl = document.getElementById('mov-origen');
+    const monedaEl = document.getElementById('mov-moneda');
+    if (!origenEl || !monedaEl) return;
+    const cuenta = getCuentas().find(c => c.key === origenEl.value);
+    if (cuenta && cuenta.moneda) {
+        monedaEl.value = cuenta.moneda;
+        monedaEl.disabled = true;
+        monedaEl.title = 'Moneda fija de ' + cuenta.label + ' (configurable en Configuración → Cuentas)';
+    } else {
+        monedaEl.disabled = false;
+        monedaEl.title = '';
+    }
 }
 
 // ════════════════════════════════════════════════════
@@ -4033,6 +4172,7 @@ function importarBackup(event) {
             document.getElementById('cfg-debito2').value = DB.cuentas.debito2;
             document.getElementById('cfg-debito3').value = DB.cuentas.debito3 || '';
             document.getElementById('cfg-debito4').value = DB.cuentas.debito4 || '';
+            document.getElementById('cfg-debito5').value = DB.cuentas.debito5 || '';
             saveImmediate(); resetPaginacion(); render();
             toast('Base de datos restaurada.', 'success');
         } catch(e) {
@@ -4116,7 +4256,7 @@ function obtenerFiltrados() {
 // ════════════════════════════════════════════════════
 function calcularMetricas(moneda) {
     moneda = moneda || 'UYU';
-    const saldos = { efectivo: 0, debito1: 0, debito2: 0, debito3: 0, debito4: 0 };
+    const saldos = { efectivo: 0, debito1: 0, debito2: 0, debito3: 0, debito4: 0, debito5: 0 };
     let tIngresos = 0, tGastos = 0;
     const mapaMensual = {};
 
@@ -4178,7 +4318,7 @@ function render() {
 
     // ── Header: métricas ──
     // Neto = suma real de las cuentas (Efectivo + Bancos), ya reflejan gastos especiales y ahorro.
-    const balTotal = metricas.saldos.efectivo + metricas.saldos.debito1 + metricas.saldos.debito2 + metricas.saldos.debito3 + metricas.saldos.debito4;
+    const balTotal = metricas.saldos.efectivo + metricas.saldos.debito1 + metricas.saldos.debito2 + metricas.saldos.debito3 + metricas.saldos.debito4 + metricas.saldos.debito5;
     setValColor('view-balance',       fmtVista(balTotal),                balTotal >= 0);
     // Disponible = Neto menos lo ya afectado a Ahorro en esta moneda.
     const disponible = balTotal - (metricas.totalAhorro || 0);
@@ -4188,24 +4328,34 @@ function render() {
     setValColor('view-bal-debito2',   fmtVista(metricas.saldos.debito2),  metricas.saldos.debito2 >= 0);
     setValColor('view-bal-debito3',   fmtVista(metricas.saldos.debito3),  metricas.saldos.debito3 >= 0);
     setValColor('view-bal-debito4',   fmtVista(metricas.saldos.debito4),  metricas.saldos.debito4 >= 0);
+    setValColor('view-bal-debito5',   fmtVista(metricas.saldos.debito5),  metricas.saldos.debito5 >= 0);
     document.getElementById('label-hdr-debito1').textContent = DB.cuentas.debito1;
     document.getElementById('label-hdr-debito2').textContent = DB.cuentas.debito2;
     document.getElementById('label-hdr-debito3').textContent = DB.cuentas.debito3 || '';
     document.getElementById('label-hdr-debito4').textContent = DB.cuentas.debito4 || '';
+    document.getElementById('label-hdr-debito5').textContent = DB.cuentas.debito5 || '';
     // Sincronizar campos de texto con DB para que no se pierdan al hacer render()
     document.getElementById('cfg-debito1').value = DB.cuentas.debito1;
     document.getElementById('cfg-debito2').value = DB.cuentas.debito2;
     document.getElementById('cfg-debito3').value = DB.cuentas.debito3 || '';
     document.getElementById('cfg-debito4').value = DB.cuentas.debito4 || '';
+    document.getElementById('cfg-debito5').value = DB.cuentas.debito5 || '';
+    ['debito1','debito2','debito3','debito4','debito5'].forEach(k => {
+        const el = document.getElementById('cfg-moneda-' + k);
+        if (el) el.value = gmMonedaCuenta(k);
+    });
+    gmPoblarSelectsGmailCuentas();
     document.getElementById('cfg-cotiz-compra').value = (DB.cotizacion && DB.cotizacion.compra) || '';
     document.getElementById('cfg-cotiz-venta').value  = (DB.cotizacion && DB.cotizacion.venta)  || '';
     gmSincronizarBotonConversion();
-    // Ocultar cuenta3/4 si están vacías
+    // Ocultar cuenta3/4/5 si están vacías
     const hasDeb3 = !!DB.cuentas.debito3;
     const hasDeb4 = !!DB.cuentas.debito4;
+    const hasDeb5 = !!DB.cuentas.debito5;
     document.getElementById('grp-debito3').style.display = hasDeb3 ? '' : 'none';
     document.getElementById('grp-debito4').style.display = hasDeb4 ? '' : 'none';
-    document.getElementById('sep-d2').style.display = (hasDeb3 || hasDeb4) ? '' : 'none';
+    document.getElementById('grp-debito5').style.display = hasDeb5 ? '' : 'none';
+    document.getElementById('sep-d2').style.display = (hasDeb3 || hasDeb4 || hasDeb5) ? '' : 'none';
 
     // ── Header mes actual ──
     // Los límites de presupuesto son en ARS; en vista USD no aplica comparación de presupuesto.
@@ -4251,6 +4401,7 @@ function render() {
         document.getElementById(id).innerHTML = optsHTML;
         if (prev) document.getElementById(id).value = prev;
     });
+    gmAlCambiarCuentaMovimiento();
 
     // ── Select filtro avanzado ──
     const filtroEl   = document.getElementById('filtro-avanzado');
@@ -4731,6 +4882,12 @@ window.addEventListener('DOMContentLoaded', function() {
     document.getElementById('cfg-debito2').value = DB.cuentas.debito2;
     document.getElementById('cfg-debito3').value = DB.cuentas.debito3 || '';
     document.getElementById('cfg-debito4').value = DB.cuentas.debito4 || '';
+    document.getElementById('cfg-debito5').value = DB.cuentas.debito5 || '';
+    ['debito1','debito2','debito3','debito4','debito5'].forEach(k => {
+        const el = document.getElementById('cfg-moneda-' + k);
+        if (el) el.value = gmMonedaCuenta(k);
+    });
+    gmPoblarSelectsGmailCuentas();
     document.getElementById('cfg-cotiz-compra').value = (DB.cotizacion && DB.cotizacion.compra) || '';
     document.getElementById('cfg-cotiz-venta').value  = (DB.cotizacion && DB.cotizacion.venta)  || '';
     gmSincronizarBotonConversion();
