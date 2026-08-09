@@ -137,6 +137,9 @@
         }
         .card-bal h4 { margin: 0; font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; font-weight: 800; }
         .card-bal p  { margin: 3px 0 0; font-size: 12px; font-weight: 800; color: var(--text-main); }
+        .card-bal.destacada { border: 1.5px solid var(--ingreso); box-shadow: 0 0 0 1px rgba(16,185,129,.15); }
+        .card-bal.destacada h4 { color: var(--ingreso); }
+        .card-bal.destacada p  { color: var(--ingreso); font-size: 13px; }
         .box-estado-financiero {
             border: 1.5px solid var(--primary); border-radius: 8px;
             padding: 8px 8px 2px; margin-bottom: 8px;
@@ -606,11 +609,13 @@
         <p id="view-gastos-especiales-nota" style="display:none; margin:2px 2px 6px; font-size:10px; color:var(--gasto);"></p>
         <div class="dash-label">💰 Tenencias</div>
         <div class="grid-dashboard">
+            <div class="card-bal destacada"><h4>💎 Disponible</h4><p id="view-disponible">$0,00</p></div>
             <div class="card-bal"><h4>Neto</h4><p id="view-balance">$0,00</p></div>
             <div class="card-bal"><h4>💵 Efectivo</h4><p id="view-bal-efectivo">$0,00</p></div>
             <div class="card-bal" id="grp-debito1"><h4 id="label-hdr-debito1">Banco 1</h4><p id="view-bal-debito1">$0,00</p></div>
             <div class="card-bal" id="grp-debito2"><h4 id="label-hdr-debito2">Banco 2</h4><p id="view-bal-debito2">$0,00</p></div>
             <div class="card-bal" id="grp-debito3" style="display:none"><h4 id="label-hdr-debito3">Banco 3</h4><p id="view-bal-debito3">$0,00</p></div>
+            <div class="card-bal" id="grp-debito4" style="display:none"><h4 id="label-hdr-debito4">Banco 4</h4><p id="view-bal-debito4">$0,00</p></div>
             <div class="card-bal" id="card-especiales-mes" onclick="gmMostrarEspecialesMes()" style="cursor:pointer;"><h4>🎁 Especiales (mes) ▾</h4><p id="view-especiales-historico" style="color:var(--gasto)">$0,00</p></div>
         </div>
     </div>
@@ -649,10 +654,13 @@
                     </div>
                     <div>
                         <label for="mov-moneda">Moneda</label>
-                        <select id="mov-moneda">
-                            <option value="UYU">$U</option>
-                            <option value="USD">USD</option>
-                        </select>
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <select id="mov-moneda" style="flex:1;">
+                                <option value="UYU">$U</option>
+                                <option value="USD">USD</option>
+                            </select>
+                            <button type="button" id="btn-mov-convertir" onclick="gmConvertirMovimiento()" title="Convertir monto a la otra moneda usando la cotización guardada" style="display:none;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-main);cursor:pointer;font-size:14px;">🔁</button>
+                        </div>
                     </div>
                     <div>
                         <label for="mov-fecha">Fecha</label>
@@ -836,7 +844,43 @@
                         <label for="cfg-debito3">Cuenta 3 (opcional)</label>
                         <input type="text" id="cfg-debito3" placeholder="Ej: Brubank">
                     </div>
+                    <div class="form-group">
+                        <label for="cfg-debito4">Cuenta 4 (opcional)</label>
+                        <input type="text" id="cfg-debito4" placeholder="Ej: Prex">
+                    </div>
                     <button id="btn-guardar-bancos" class="btn-secondary btn-block" style="margin-top:2px;">Actualizar nombres</button>
+
+                    <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:6px;">💱 Cotización dólar</label>
+                        <p style="font-size:10px;color:var(--text-muted);margin:0 0 8px;">Se usan para el conversor y para autocompletar montos al cambiar de moneda en un movimiento.</p>
+                        <div style="display:flex;gap:6px;">
+                            <div style="flex:1;">
+                                <label for="cfg-cotiz-compra" style="font-size:10px;">Compra ($U por USD)</label>
+                                <input type="number" id="cfg-cotiz-compra" step="0.01" min="0" placeholder="Ej: 39,50">
+                            </div>
+                            <div style="flex:1;">
+                                <label for="cfg-cotiz-venta" style="font-size:10px;">Venta ($U por USD)</label>
+                                <input type="number" id="cfg-cotiz-venta" step="0.01" min="0" placeholder="Ej: 41,20">
+                            </div>
+                        </div>
+                        <button id="btn-guardar-cotizacion" class="btn-secondary btn-block" style="margin-top:6px;" onclick="guardarCotizacion()">Guardar cotización</button>
+
+                        <div style="margin-top:12px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;">
+                            <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">Conversor</div>
+                            <div style="display:flex;gap:6px;align-items:flex-end;">
+                                <div style="flex:1;">
+                                    <label for="conv-uyu" style="font-size:10px;">$U</label>
+                                    <input type="number" id="conv-uyu" step="0.01" placeholder="0,00" oninput="gmConvertirDesde('uyu')">
+                                </div>
+                                <div style="flex:1;">
+                                    <label for="conv-usd" style="font-size:10px;">USD</label>
+                                    <input type="number" id="conv-usd" step="0.01" placeholder="0,00" oninput="gmConvertirDesde('usd')">
+                                </div>
+                            </div>
+                            <p style="font-size:10px;color:var(--text-muted);margin:6px 0 0;">$U→USD usa cotización venta · USD→$U usa cotización compra</p>
+                        </div>
+                    </div>
 
                     <hr style="margin:16px 0;border:none;border-top:1px solid var(--border);">
                     <div class="form-group">
@@ -872,7 +916,7 @@
 // ════════════════════════════════════════════════════
 //  CONSTANTES Y ESTADO GLOBAL
 // ════════════════════════════════════════════════════
-const APP_VERSION = '1.0.2-dev';
+const APP_VERSION = '1.2.0-dev';
 const DEV_MODE = true; // finanzas-mariela-2 (dev): Drive SOLO LECTURA — puede bajar/fusionar backups de la carpeta de prod, nunca subir
 
 function gmNuevoUUID() {
@@ -929,10 +973,14 @@ function gmInsertarAyudas() {
 const GM_DRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/gmail.readonly';
 const GM_GTOKEN_KEY      = 'fm_gtoken';
 const GM_GTOKEN_EXP_KEY  = 'fm_gtoken_exp';
+const GM_GTOKEN_EMAIL_KEY     = 'fm_gtoken_email';
 const GM_GTOKEN_SCOPE_KEY     = 'fm_gtoken_scope_v';
 const GM_GTOKEN_SCOPE_VERSION = '3'; // v3: + gmail.readonly para detección de mails Santander
 const GM_CLIENT_ID_KEY   = 'fm_drive_client_id';
 const GM_DRIVE_FOLDER    = 'FinanzasMariela';
+// El backup de Finanzas Mariela va SIEMPRE al Drive de Mariela — no se permite
+// conectar con ninguna otra cuenta de Google, ni siquiera silenciosamente.
+const GM_CUENTA_REQUERIDA = 'margonqui@gmail.com';
 let gmGToken = null;
 let gmDriveFileId = null;
 let _gmFolderId = null;
@@ -952,12 +1000,13 @@ function gmActualizarBotonesDrive() {
     document.getElementById('btn-gm-drive-up').style.display   = (tieneClientId && !DEV_MODE) ? '' : 'none';
     document.getElementById('btn-gm-drive-down').style.display = tieneClientId ? '' : 'none';
 }
-function gmGTokenGuardar(token, expiresIn) {
+function gmGTokenGuardar(token, expiresIn, email) {
     const exp = Date.now() + (expiresIn||3500)*1000;
     try {
         localStorage.setItem(GM_GTOKEN_KEY, token);
         localStorage.setItem(GM_GTOKEN_EXP_KEY, String(exp));
         localStorage.setItem(GM_GTOKEN_SCOPE_KEY, GM_GTOKEN_SCOPE_VERSION);
+        if(email) localStorage.setItem(GM_GTOKEN_EMAIL_KEY, email);
     } catch(e){}
     gmGToken = token;
 }
@@ -966,14 +1015,28 @@ function gmGTokenCargarLocal() {
         const t = localStorage.getItem(GM_GTOKEN_KEY);
         const exp = parseInt(localStorage.getItem(GM_GTOKEN_EXP_KEY)||'0');
         const scopeV = localStorage.getItem(GM_GTOKEN_SCOPE_KEY);
-        // Token viejo (scope appDataFolder) no sirve para la carpeta visible: se descarta y se re-pide consentimiento
-        if(t && exp && Date.now() < exp - 60000 && scopeV === GM_GTOKEN_SCOPE_VERSION) { gmGToken = t; return true; }
+        const email = (localStorage.getItem(GM_GTOKEN_EMAIL_KEY)||'').toLowerCase();
+        // Token viejo (scope appDataFolder, o de otra cuenta que no sea la de Mariela) no sirve: se descarta y se re-pide consentimiento
+        if(t && exp && Date.now() < exp - 60000 && scopeV === GM_GTOKEN_SCOPE_VERSION && email === GM_CUENTA_REQUERIDA) { gmGToken = t; return true; }
     } catch(e){}
     return false;
 }
 function gmGTokenLimpiar() {
     gmGToken = null;
-    try { localStorage.removeItem(GM_GTOKEN_KEY); localStorage.removeItem(GM_GTOKEN_EXP_KEY); } catch(e){}
+    try { localStorage.removeItem(GM_GTOKEN_KEY); localStorage.removeItem(GM_GTOKEN_EXP_KEY); localStorage.removeItem(GM_GTOKEN_EMAIL_KEY); } catch(e){}
+}
+// Confirma con la Drive API a qué cuenta de Google pertenece el token recién
+// obtenido. Necesario porque `hint` solo sugiere la cuenta en el selector —
+// no impide que se elija otra — así que la app valida después de conectar.
+async function gmVerificarCuentaDrive(token) {
+    try {
+        const resp = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+        if(!resp.ok) return null;
+        const data = await resp.json();
+        return (data.user && data.user.emailAddress) ? data.user.emailAddress.toLowerCase() : null;
+    } catch(e) { return null; }
 }
 function gmCargarGoogle(cb) {
     if(typeof google !== 'undefined') { cb(); return; }
@@ -983,26 +1046,45 @@ function gmCargarGoogle(cb) {
     s.onerror = () => alert('No se pudo cargar Google. Verificá la conexión.');
     document.head.appendChild(s);
 }
-function gmGetToken(cb) {
+function gmGetToken(cb, interactivo) {
+    if(interactivo === undefined) interactivo = true;
     if(gmGTokenCargarLocal()) { cb(gmGToken); return; }
     const clientId = gmGetClientId();
-    if(!clientId) { alert('Configurá el Client ID de Drive en la pestaña Cuentas.'); return; }
+    if(!clientId) { if(interactivo) alert('Configurá el Client ID de Drive en la pestaña Cuentas.'); return; }
     gmCargarGoogle(() => {
         if(gmGToken) { cb(gmGToken); return; }
-        const client = google.accounts.oauth2.initTokenClient({
-            client_id: clientId, scope: GM_DRIVE_SCOPE, prompt: '',
-            callback: resp => {
-                if(resp.error === 'interaction_required' || resp.error === 'user_logged_out') {
-                    const c2 = google.accounts.oauth2.initTokenClient({
-                        client_id: clientId, scope: GM_DRIVE_SCOPE,
-                        callback: r2 => { if(r2.error){alert('Error: '+r2.error);return;} gmGTokenGuardar(r2.access_token, r2.expires_in); cb(gmGToken); }
-                    });
-                    c2.requestAccessToken(); return;
-                }
-                if(resp.error) { alert('Error Google: ' + resp.error); return; }
-                gmGTokenGuardar(resp.access_token, resp.expires_in);
-                cb(gmGToken);
+
+        function pedirConSelectorDeCuenta() {
+            const c2 = google.accounts.oauth2.initTokenClient({
+                client_id: clientId, scope: GM_DRIVE_SCOPE, hint: GM_CUENTA_REQUERIDA,
+                callback: r2 => procesarToken(r2, false)
+            });
+            c2.requestAccessToken({ prompt: 'select_account', hint: GM_CUENTA_REQUERIDA });
+        }
+
+        const procesarToken = async (resp, permitirReintento) => {
+            if(resp.error === 'interaction_required' || resp.error === 'user_logged_out') {
+                if(permitirReintento && interactivo) pedirConSelectorDeCuenta();
+                return;
             }
+            if(resp.error) { if(interactivo) alert('Error Google: ' + resp.error); return; }
+            // `hint` solo sugiere la cuenta en el selector, no impide elegir otra —
+            // así que se valida con la Drive API a qué cuenta pertenece el token.
+            const email = await gmVerificarCuentaDrive(resp.access_token);
+            if(email !== GM_CUENTA_REQUERIDA) {
+                fetch('https://oauth2.googleapis.com/revoke?token=' + resp.access_token, { method: 'POST' }).catch(()=>{});
+                gmGTokenLimpiar();
+                if(permitirReintento && interactivo) { pedirConSelectorDeCuenta(); return; }
+                if(interactivo) alert(`Finanzas Mariela solo se conecta al Drive de Mariela (${GM_CUENTA_REQUERIDA}). Elegí esa cuenta en el selector de Google.`);
+                return;
+            }
+            gmGTokenGuardar(resp.access_token, resp.expires_in, email);
+            cb(gmGToken);
+        };
+
+        const client = google.accounts.oauth2.initTokenClient({
+            client_id: clientId, scope: GM_DRIVE_SCOPE, prompt: '', hint: GM_CUENTA_REQUERIDA,
+            callback: resp => procesarToken(resp, true)
         });
         client.requestAccessToken({prompt:''});
     });
@@ -1211,7 +1293,7 @@ function gmMergeRubros(remoto) {
 // y del otro lado ya le pusieron nombre real, lo adopta. Si ya tiene un nombre propio distinto, no lo toca. ──
 function gmMergeCuentas(remoto) {
     if (!remoto || !remoto.cuentas) return 0;
-    const defaults = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '' };
+    const defaults = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '', debito4: '' };
     let actualizados = 0;
     Object.keys(defaults).forEach(key => {
         const local = (DB.cuentas[key] || '').trim();
@@ -1440,7 +1522,7 @@ function gmGmailMostrarSiguiente() {
 
 function gmAbrirModalGmail(datos) {
     document.getElementById('gm-gmail-overlay')?.remove();
-    const rubrosOpts = DB.rubros.filter(r => !r.especial).map(r => `<option value="${r.id}">${r.nombre}</option>`).join('');
+    const rubrosOpts = DB.rubros.filter(r => r.tipo === 'gasto').map(r => `<option value="${r.id}">${r.nombre}</option>`).join('');
     const ov = document.createElement('div');
     ov.id = 'gm-gmail-overlay';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;';
@@ -1740,8 +1822,10 @@ let DB = {
         efectivo: 'Efectivo',
         debito1:  'Banco 1',
         debito2:  'Banco 2',
-        debito3:  ''           // opcional; vacío = oculta
+        debito3:  '',          // opcional; vacío = oculta
+        debito4:  ''           // opcional; vacío = oculta
     },
+    cotizacion: { compra: 0, venta: 0 }, // dólar: compra = banco te compra USD (vendés vos); venta = banco te vende USD (comprás vos)
     presupuestosHistoricos: {},
     ahorros: {
         subrubros: [
@@ -1888,12 +1972,16 @@ function migrar(data) {
     }
     // Garantizar estructura cuentas siempre (por si viene de backup raro)
     if (!data.cuentas || typeof data.cuentas !== 'object') {
-        data.cuentas = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '' };
+        data.cuentas = { efectivo: 'Efectivo', debito1: 'Banco 1', debito2: 'Banco 2', debito3: '', debito4: '' };
     }
     data.cuentas.efectivo = data.cuentas.efectivo || 'Efectivo';
     data.cuentas.debito1  = data.cuentas.debito1  || 'Banco 1';
     data.cuentas.debito2  = data.cuentas.debito2  || 'Banco 2';
     data.cuentas.debito3  = data.cuentas.debito3  || '';
+    data.cuentas.debito4  = data.cuentas.debito4  || '';
+    if (!data.cotizacion || typeof data.cotizacion !== 'object') {
+        data.cotizacion = { compra: 0, venta: 0 };
+    }
     return data;
 }
 
@@ -2006,6 +2094,7 @@ function getCuentas() {
         { key: 'debito2',  label: DB.cuentas.debito2  || 'Banco 2',  icon: '💳' },
     ];
     if (DB.cuentas.debito3) lista.push({ key: 'debito3', label: DB.cuentas.debito3, icon: '💳' });
+    if (DB.cuentas.debito4) lista.push({ key: 'debito4', label: DB.cuentas.debito4, icon: '💳' });
     return lista;
 }
 function labelCuenta(key) {
@@ -3665,6 +3754,7 @@ function guardarCuentas() {
     DB.cuentas.debito1 = document.getElementById('cfg-debito1').value.trim() || 'Banco 1';
     DB.cuentas.debito2 = document.getElementById('cfg-debito2').value.trim() || 'Banco 2';
     DB.cuentas.debito3 = document.getElementById('cfg-debito3').value.trim();
+    DB.cuentas.debito4 = document.getElementById('cfg-debito4').value.trim();
     const btn = document.getElementById('btn-guardar-bancos');
     btn.textContent = '✓ Actualizado';
     btn.style.background = 'var(--ingreso)';
@@ -3677,6 +3767,72 @@ function guardarCuentas() {
     toast('Cuentas actualizadas.', 'success');
     save(); render();
     initMesesVisor();
+}
+
+// ════════════════════════════════════════════════════
+//  COTIZACIÓN DÓLAR Y CONVERSOR
+// ════════════════════════════════════════════════════
+function guardarCotizacion() {
+    const compra = parseFloat(document.getElementById('cfg-cotiz-compra').value) || 0;
+    const venta  = parseFloat(document.getElementById('cfg-cotiz-venta').value) || 0;
+    DB.cotizacion = { compra, venta };
+    const btn = document.getElementById('btn-guardar-cotizacion');
+    btn.textContent = '✓ Guardada';
+    btn.style.background = 'var(--ingreso)';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+        btn.textContent = 'Guardar cotización';
+        btn.style.background = '';
+        btn.style.color = '';
+    }, 1200);
+    toast('Cotización actualizada.', 'success');
+    save();
+    gmSincronizarBotonConversion();
+}
+
+// Convierte en vivo dentro del conversor de Configuración/Cuentas
+function gmConvertirDesde(origen) {
+    const compra = (DB.cotizacion && DB.cotizacion.compra) || 0;
+    const venta  = (DB.cotizacion && DB.cotizacion.venta)  || 0;
+    const elUyu = document.getElementById('conv-uyu');
+    const elUsd = document.getElementById('conv-usd');
+    if (origen === 'uyu') {
+        const v = parseFloat(elUyu.value);
+        if (!isNaN(v) && venta > 0) elUsd.value = (v / venta).toFixed(2);
+        else if (elUyu.value === '') elUsd.value = '';
+    } else {
+        const v = parseFloat(elUsd.value);
+        if (!isNaN(v) && compra > 0) elUyu.value = (v * compra).toFixed(2);
+        else if (elUsd.value === '') elUyu.value = '';
+    }
+}
+
+// Convierte monto+moneda del formulario de movimiento a la otra moneda, usando la cotización guardada
+function gmConvertirMovimiento() {
+    const compra = (DB.cotizacion && DB.cotizacion.compra) || 0;
+    const venta  = (DB.cotizacion && DB.cotizacion.venta)  || 0;
+    const elMonto  = document.getElementById('mov-monto');
+    const elMoneda = document.getElementById('mov-moneda');
+    const monto = parseFloat(elMonto.value);
+    if (isNaN(monto) || monto <= 0) { toast('Ingresá un monto primero.', 'error'); return; }
+    if (elMoneda.value === 'UYU') {
+        if (venta <= 0) { toast('Configurá la cotización venta en Configuración → Cuentas.', 'error'); return; }
+        elMonto.value = (monto / venta).toFixed(2);
+        elMoneda.value = 'USD';
+    } else {
+        if (compra <= 0) { toast('Configurá la cotización compra en Configuración → Cuentas.', 'error'); return; }
+        elMonto.value = (monto * compra).toFixed(2);
+        elMoneda.value = 'UYU';
+    }
+    toast('Monto convertido a ' + elMoneda.value + '.', 'success');
+}
+
+// Muestra/oculta el botón de conversión rápida en el form de movimiento según haya cotización cargada
+function gmSincronizarBotonConversion() {
+    const btn = document.getElementById('btn-mov-convertir');
+    if (!btn) return;
+    const tieneCotiz = DB.cotizacion && (DB.cotizacion.compra > 0 || DB.cotizacion.venta > 0);
+    btn.style.display = tieneCotiz ? 'inline-flex' : 'none';
 }
 
 // ════════════════════════════════════════════════════
@@ -3876,6 +4032,7 @@ function importarBackup(event) {
             document.getElementById('cfg-debito1').value = DB.cuentas.debito1;
             document.getElementById('cfg-debito2').value = DB.cuentas.debito2;
             document.getElementById('cfg-debito3').value = DB.cuentas.debito3 || '';
+            document.getElementById('cfg-debito4').value = DB.cuentas.debito4 || '';
             saveImmediate(); resetPaginacion(); render();
             toast('Base de datos restaurada.', 'success');
         } catch(e) {
@@ -3959,7 +4116,7 @@ function obtenerFiltrados() {
 // ════════════════════════════════════════════════════
 function calcularMetricas(moneda) {
     moneda = moneda || 'UYU';
-    const saldos = { efectivo: 0, debito1: 0, debito2: 0, debito3: 0 };
+    const saldos = { efectivo: 0, debito1: 0, debito2: 0, debito3: 0, debito4: 0 };
     let tIngresos = 0, tGastos = 0;
     const mapaMensual = {};
 
@@ -4000,7 +4157,14 @@ function calcularMetricas(moneda) {
         else if (m.tipo === 'retiro') saldos[m.origen] += m.monto;
     });
 
-    return { tIngresos, tGastos, tGastosEspeciales, saldos, mapaMensual };
+    // Total ahorrado en esta moneda (suma de saldos de todos los subrubros de Ahorro)
+    let totalAhorro = 0;
+    const saldosSubrubro = gmSaldosPorSubrubro();
+    (DB.ahorros.subrubros || []).forEach(s => {
+        if (gmMonedaSubrubro(s) === moneda) totalAhorro += (saldosSubrubro[s.id] || 0);
+    });
+
+    return { tIngresos, tGastos, tGastosEspeciales, saldos, mapaMensual, totalAhorro };
 }
 
 // ════════════════════════════════════════════════════
@@ -4013,23 +4177,35 @@ function render() {
     actualizarListaNotasUsadas();
 
     // ── Header: métricas ──
-    const balTotal = metricas.tIngresos - metricas.tGastos;
+    // Neto = suma real de las cuentas (Efectivo + Bancos), ya reflejan gastos especiales y ahorro.
+    const balTotal = metricas.saldos.efectivo + metricas.saldos.debito1 + metricas.saldos.debito2 + metricas.saldos.debito3 + metricas.saldos.debito4;
     setValColor('view-balance',       fmtVista(balTotal),                balTotal >= 0);
+    // Disponible = Neto menos lo ya afectado a Ahorro en esta moneda.
+    const disponible = balTotal - (metricas.totalAhorro || 0);
+    setValColor('view-disponible',    fmtVista(disponible),              disponible >= 0);
     setValColor('view-bal-efectivo',  fmtVista(metricas.saldos.efectivo), metricas.saldos.efectivo >= 0);
     setValColor('view-bal-debito1',   fmtVista(metricas.saldos.debito1),  metricas.saldos.debito1 >= 0);
     setValColor('view-bal-debito2',   fmtVista(metricas.saldos.debito2),  metricas.saldos.debito2 >= 0);
     setValColor('view-bal-debito3',   fmtVista(metricas.saldos.debito3),  metricas.saldos.debito3 >= 0);
+    setValColor('view-bal-debito4',   fmtVista(metricas.saldos.debito4),  metricas.saldos.debito4 >= 0);
     document.getElementById('label-hdr-debito1').textContent = DB.cuentas.debito1;
     document.getElementById('label-hdr-debito2').textContent = DB.cuentas.debito2;
     document.getElementById('label-hdr-debito3').textContent = DB.cuentas.debito3 || '';
+    document.getElementById('label-hdr-debito4').textContent = DB.cuentas.debito4 || '';
     // Sincronizar campos de texto con DB para que no se pierdan al hacer render()
     document.getElementById('cfg-debito1').value = DB.cuentas.debito1;
     document.getElementById('cfg-debito2').value = DB.cuentas.debito2;
     document.getElementById('cfg-debito3').value = DB.cuentas.debito3 || '';
-    // Ocultar cuenta3 si está vacía
+    document.getElementById('cfg-debito4').value = DB.cuentas.debito4 || '';
+    document.getElementById('cfg-cotiz-compra').value = (DB.cotizacion && DB.cotizacion.compra) || '';
+    document.getElementById('cfg-cotiz-venta').value  = (DB.cotizacion && DB.cotizacion.venta)  || '';
+    gmSincronizarBotonConversion();
+    // Ocultar cuenta3/4 si están vacías
     const hasDeb3 = !!DB.cuentas.debito3;
+    const hasDeb4 = !!DB.cuentas.debito4;
     document.getElementById('grp-debito3').style.display = hasDeb3 ? '' : 'none';
-    document.getElementById('sep-d2').style.display = hasDeb3 ? '' : 'none';
+    document.getElementById('grp-debito4').style.display = hasDeb4 ? '' : 'none';
+    document.getElementById('sep-d2').style.display = (hasDeb3 || hasDeb4) ? '' : 'none';
 
     // ── Header mes actual ──
     // Los límites de presupuesto son en ARS; en vista USD no aplica comparación de presupuesto.
@@ -4528,7 +4704,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Reconecta/renueva el token de Drive en silencio al abrir (sin popup, solo si
     // Drive ya está configurado), para que al tocar Salir el backup sea instantáneo.
-    if (gmGetClientId()) { gmGetToken(function(){}); }
+    if (!DEV_MODE && gmGetClientId()) { gmGetToken(function(){}, false); }
 
     // Cargar datos
     let rawData = localStorage.getItem(SKEY);
@@ -4554,6 +4730,10 @@ window.addEventListener('DOMContentLoaded', function() {
     document.getElementById('cfg-debito1').value = DB.cuentas.debito1;
     document.getElementById('cfg-debito2').value = DB.cuentas.debito2;
     document.getElementById('cfg-debito3').value = DB.cuentas.debito3 || '';
+    document.getElementById('cfg-debito4').value = DB.cuentas.debito4 || '';
+    document.getElementById('cfg-cotiz-compra').value = (DB.cotizacion && DB.cotizacion.compra) || '';
+    document.getElementById('cfg-cotiz-venta').value  = (DB.cotizacion && DB.cotizacion.venta)  || '';
+    gmSincronizarBotonConversion();
     document.getElementById('mov-fecha').value   = hoyISO();
 
     // Eventos
@@ -4571,7 +4751,7 @@ window.addEventListener('DOMContentLoaded', function() {
     initMenuDropdown();
     initMesesVisor();
     gmInsertarAyudas();
-    setTimeout(() => { if (!DEV_MODE) gmGmailChequear(false); }, 4000);
+    setTimeout(() => { gmGmailChequear(false); }, 4000);
 
     document.getElementById('mov-tipo-flujo').addEventListener('change', alternarFormCarga);
     document.getElementById('rubro-tipo').addEventListener('change', alternarInputPresupuesto);
@@ -4648,6 +4828,7 @@ window.addEventListener('DOMContentLoaded', function() {
     gmActualizarBotonesDrive();
 
     // Sync automático y silencioso: si ya hay token de Drive vigente (sin popup), fusiona el backup más nuevo
+    // (permitido también en DEV: es bajada/fusión, no subida)
     if (gmGetClientId() && gmGTokenCargarLocal()) {
         setTimeout(() => gmAutoMergeAlAbrir(), 5400);
     }
