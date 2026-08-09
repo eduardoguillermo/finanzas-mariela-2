@@ -953,7 +953,7 @@
 // ════════════════════════════════════════════════════
 //  CONSTANTES Y ESTADO GLOBAL
 // ════════════════════════════════════════════════════
-const APP_VERSION = '1.3.2-dev';
+const APP_VERSION = '1.3.1-dev';
 const DEV_MODE = true; // finanzas-mariela-2 (dev): Drive SOLO LECTURA — puede bajar/fusionar backups de la carpeta de prod, nunca subir
 
 function gmNuevoUUID() {
@@ -4291,11 +4291,12 @@ function calcularMetricas(moneda) {
             }
         }
     });
-    // Nota: los movimientos de Ahorro NO restan/suman el saldo de la cuenta (Neto).
-    // Neto es la plata física real (ingresos - gastos - transferencias). El hecho de "apartar"
-    // una parte hacia Ahorro no la saca de la cuenta físicamente — solo se descuenta una vez,
-    // en el cálculo de Disponible = Neto - totalAhorro (más abajo). Restarla acá también
-    // duplicaba el descuento (Neto ya la restaba y Disponible la volvía a restar).
+    (DB.ahorros.movimientos || []).forEach(m => {
+        if (!m.origen || saldos[m.origen] === undefined) return;
+        if ((m.moneda || 'UYU') !== moneda) return;
+        if (m.tipo === 'ingreso') saldos[m.origen] -= m.monto;
+        else if (m.tipo === 'retiro') saldos[m.origen] += m.monto;
+    });
 
     // Total ahorrado en esta moneda (suma de saldos de todos los subrubros de Ahorro)
     let totalAhorro = 0;
