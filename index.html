@@ -588,6 +588,7 @@
                 <button class="btn-secondary btn-sm btn-block dd-btn" onclick="document.getElementById('file-import').click();">📤 Importar backup</button>
                 <button class="btn-secondary btn-sm btn-block dd-btn" id="btn-gm-drive-up" onclick="gmDriveSubir(); cerrarMenuDropdown();" style="display:none;background:#4285f4;color:white;border-color:#4285f4;">☁️ Subir a Drive</button>
                 <button class="btn-secondary btn-sm btn-block dd-btn" id="btn-gm-drive-down" onclick="gmDriveRestaurar(); cerrarMenuDropdown();" style="display:none;background:#4285f4;color:white;border-color:#4285f4;">📂 Restaurar de Drive</button>
+                <button class="btn-secondary btn-sm btn-block dd-btn" id="btn-gm-drive-up-prod" onclick="gmDriveSubirAProd(); cerrarMenuDropdown();" style="display:none;background:#dc2626;color:white;border-color:#dc2626;">🚀☁️ Subir backup a PROD</button>
                 <button class="btn-secondary btn-sm btn-block dd-btn" onclick="gmMostrarSnapshots(); cerrarMenuDropdown();">💾 Snapshots locales</button>
                 <hr>
                 <div class="dd-label">Reportes</div>
@@ -953,7 +954,7 @@
 // ════════════════════════════════════════════════════
 //  CONSTANTES Y ESTADO GLOBAL
 // ════════════════════════════════════════════════════
-const APP_VERSION = '1.3.1-dev';
+const APP_VERSION = '1.3.2-dev';
 const DEV_MODE = true; // finanzas-mariela-2 (dev): Drive SOLO LECTURA — puede bajar/fusionar backups de la carpeta de prod, nunca subir
 
 function gmNuevoUUID() {
@@ -1036,6 +1037,9 @@ function gmActualizarBotonesDrive() {
     // DEV: solo lectura — el botón de subir queda oculto, el de bajar/fusionar sigue disponible
     document.getElementById('btn-gm-drive-up').style.display   = (tieneClientId && !DEV_MODE) ? '' : 'none';
     document.getElementById('btn-gm-drive-down').style.display = tieneClientId ? '' : 'none';
+    // DEV: botón especial para empujar un backup puntual a la carpeta compartida de PROD (con confirmación)
+    const btnUpProd = document.getElementById('btn-gm-drive-up-prod');
+    if (btnUpProd) btnUpProd.style.display = (tieneClientId && DEV_MODE) ? '' : 'none';
 }
 function gmGTokenGuardar(token, expiresIn, email) {
     const exp = Date.now() + (expiresIn||3500)*1000;
@@ -1154,6 +1158,38 @@ function gmDriveSubir() {
                 {method:'POST', headers:{Authorization:'Bearer '+token}, body:form})
             .then(r=>r.json())
             .then(f => { if(f.id) { toast('✅ Backup subido a Drive: '+nombre, 'success'); } else { toast('Error al subir: '+JSON.stringify(f), 'error'); gmGTokenLimpiar(); }})
+            .catch(e => { toast('Error: '+e.message, 'error'); gmGTokenLimpiar(); });
+        });
+    });
+}
+// Empuje manual DEV → PROD: sube el backup ACTUAL (los datos que hay en este
+// entorno de desarrollo) a la misma carpeta de Drive "FinanzasMariela" que usa
+// producción. Es la ÚNICA vía de escritura habilitada desde dev, y exige
+// confirmación explícita porque puede terminar mezclándose/reemplazando datos
+// reales de Mariela si alguien lo usa por error.
+async function gmDriveSubirAProd() {
+    if (!DEV_MODE) return; // esta acción solo tiene sentido desde el entorno dev
+    const ok = await showConfirm(
+        '🚀 Subir backup a PROD',
+        'Vas a subir el backup ACTUAL de este entorno de DESARROLLO a la carpeta de Google Drive "FinanzasMariela", la misma que usa Finanzas Mariela en PRODUCCIÓN para sus backups. El archivo va a quedar disponible ahí para que prod lo pueda fusionar o reemplazar. ¿Confirmás que querés subirlo?',
+        'Sí, subir a PROD',
+        true
+    );
+    if (!ok) { toast('Subida a PROD cancelada.', 'info'); return; }
+    gmGetToken(token => {
+        gmDriveEnsureFolder(token, folderId => {
+            const ahora = new Date();
+            const ts = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')}-${String(ahora.getHours()).padStart(2,'0')}-${String(ahora.getMinutes()).padStart(2,'0')}`;
+            const nombre = `finanzaspro_backup_${ts}.json`;
+            const data = JSON.stringify(DB, null, 2);
+            const meta = JSON.stringify({name: nombre, parents: [folderId]});
+            const form = new FormData();
+            form.append('metadata', new Blob([meta], {type:'application/json'}));
+            form.append('file',     new Blob([data], {type:'application/json'}));
+            fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+                {method:'POST', headers:{Authorization:'Bearer '+token}, body:form})
+            .then(r=>r.json())
+            .then(f => { if(f.id) { toast('🚀☁️ Backup de DEV subido a PROD: '+nombre, 'success', 4000); } else { toast('Error al subir: '+JSON.stringify(f), 'error'); gmGTokenLimpiar(); }})
             .catch(e => { toast('Error: '+e.message, 'error'); gmGTokenLimpiar(); });
         });
     });
